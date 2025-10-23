@@ -1,0 +1,13 @@
+{
+  "name": "local-diary-monorepo",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "mobile": "npm start --workspace=@local-diary/app-mobile",
+    "mobile:ios": "npm run ios --workspace=@local-diary/app-mobile",
+    "mobile:android": "npm run android --workspace=@local-diary/app-mobile"
+  }
+}
