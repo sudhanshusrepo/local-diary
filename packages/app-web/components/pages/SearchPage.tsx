@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { SearchIcon } from '../icons/SearchIcon';
 import { ServiceProvider } from '../../../shared/types';
 import { StarIcon } from '../icons/StarIcon';
@@ -33,7 +33,8 @@ const StarRating: React.FC<{ rating: number }> = ({ rating }) => {
 
 
 const SearchPage: React.FC = () => {
-  const { status, errorMessage, getPosition } = useGeolocation({ timeout: 10000 });
+  const geolocationOptions = useMemo<PositionOptions>(() => ({ timeout: 10000 }), []);
+  const { status, errorMessage, getPosition } = useGeolocation(geolocationOptions);
   const [searchResults, setSearchResults] = useState<ServiceProvider[]>([]);
   
   const [isModalOpen, setIsModalOpen] = useState(false);
