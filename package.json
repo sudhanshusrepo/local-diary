@@ -6,8 +6,26 @@
     "packages/*"
   ],
   "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 4173 --strictPort",
     "mobile": "npm start --workspace=@local-diary/app-mobile",
     "mobile:ios": "npm run ios --workspace=@local-diary/app-mobile",
     "mobile:android": "npm run android --workspace=@local-diary/app-mobile"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@google/genai": "^1.26.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.10",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.2",
+    "typescript": "^5.4.5",
+    "vite": "^5.4.8"
   }
 }

@@ -1,7 +1,17 @@
 
 import { GoogleGenAI } from "@google/genai";
 
-const API_KEY = process.env.API_KEY;
+// Never reference process.env in the browser. Use Vite env (import.meta.env) safely.
+const getApiKey = (): string | undefined => {
+  try {
+    const env = (import.meta as any).env || {};
+    return env.VITE_GEMINI_API_KEY as string | undefined;
+  } catch {
+    return undefined;
+  }
+};
+
+const API_KEY = getApiKey();
 
 let aiClient: GoogleGenAI | null = null;
 const getAiClient = (): GoogleGenAI | null => {
