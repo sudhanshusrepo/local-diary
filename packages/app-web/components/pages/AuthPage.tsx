@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { CloseIcon } from '../icons/CloseIcon';
+import { fetchJSON, saveToken } from '../../services/apiClient';
 
 interface AuthPageProps {
   onLoginSuccess: () => void;
@@ -11,17 +12,47 @@ interface AuthPageProps {
 
 const AuthPage: React.FC<AuthPageProps> = ({ onLoginSuccess, onSignupSuccess, onBack }) => {
   const [isLogin, setIsLogin] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
-  // Mock handlers
-  const handleLogin = (e: React.FormEvent) => {
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-    onLoginSuccess();
-  };
+    setError(null); setLoading(true);
+    try {
+      const email = (document.getElementById('email') as HTMLInputElement)?.value;
+      const password = (document.getElementById('password') as HTMLInputElement)?.value;
+      const data = await fetchJSON<{ access_token: string; user: any }>('/api/auth-login', {
+        method: 'POST',
+        body: JSON.stringify({ email, password })
+      });
+      saveToken(data.access_token);
+      onLoginSuccess();
+    } catch (err: any) {
+      setError(err?.message || 'Login failed');
+    } finally {
+      setLoading(false);
+    }
+  }
 
-  const handleSignup = (e: React.FormEvent) => {
+  async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
-    onSignupSuccess();
-  };
+    setError(null); setLoading(true);
+    try {
+      const name = (document.getElementById('name') as HTMLInputElement)?.value;
+      const email = (document.getElementById('email') as HTMLInputElement)?.value;
+      const password = (document.getElementById('password') as HTMLInputElement)?.value;
+      await fetchJSON<{ user: any }>('/api/auth-signup', {
+        method: 'POST',
+        body: JSON.stringify({ email, password, metadata: { name } })
+      });
+      onSignupSuccess();
+    } catch (err: any) {
+      setError(err?.message || 'Sign up failed');
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-radial from-brand-secondary/20 to-brand-dark p-4">
@@ -39,11 +70,17 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLoginSuccess, onSignupSuccess, on
         <form onSubmit={isLogin ? handleLogin : handleSignup} className="space-y-6">
           {!isLogin && <Input id="name" label="Full Name" type="text" required />}
           <Input id="email" label="Email Address" type="email" required />
-          <Input id="password" label="Password" type="password" required />
+          <div className="relative">
+            <Input id="password" label="Password" type={showPassword ? 'text' : 'password'} required />
+            <button type="button" className="absolute right-3 top-[34px] text-slate-400 hover:text-white text-sm" onClick={() => setShowPassword(v => !v)}>
+              {showPassword ? 'Hide' : 'Show'}
+            </button>
+          </div>
           {!isLogin && <Input id="confirm-password" label="Confirm Password" type="password" required />}
-          
-          <Button type="submit" className="w-full !py-4 text-lg">
-            {isLogin ? 'Login' : 'Sign Up'}
+          {error && <p className="text-sm text-red-400">{error}</p>}
+
+          <Button type="submit" className="w-full !py-4 text-lg" disabled={loading}>
+            {loading ? 'Please wait…' : (isLogin ? 'Login' : 'Sign Up')}
           </Button>
         </form>
 

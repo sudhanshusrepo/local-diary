@@ -5,6 +5,7 @@ import { Select } from '../ui/Select';
 import { Toggle } from '../ui/Toggle';
 import { UserProfile } from '../../../shared/types';
 import { UserIcon } from '../icons/UserIcon';
+import { fetchJSON } from '../../services/apiClient';
 
 interface ProfileSetupPageProps {
   onComplete: (profile: UserProfile) => void;
@@ -35,7 +36,7 @@ const ProfileSetupPage: React.FC<ProfileSetupPageProps> = ({ onComplete }) => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !qualification || !industry || !profile || !employmentStatus) {
       alert("Please fill all mandatory fields.");
@@ -67,7 +68,7 @@ const ProfileSetupPage: React.FC<ProfileSetupPageProps> = ({ onComplete }) => {
 
     const finalAvatarUrl = avatarPreview || `https://picsum.photos/seed/${name || 'default'}/200`;
 
-    onComplete({
+    const finalProfile: UserProfile = {
       name,
       highestQualification: qualification,
       workIndustry: industry,
@@ -78,7 +79,16 @@ const ProfileSetupPage: React.FC<ProfileSetupPageProps> = ({ onComplete }) => {
       bio: `A passionate ${profile} in the ${industry} industry.`,
       employmentStatus: employmentStatus as 'Employed' | 'Unemployed' | 'Freelancer',
       ...profileData,
-    });
+    };
+
+    try {
+      await fetchJSON('/api/profile', {
+        method: 'PUT',
+        body: JSON.stringify({ name: finalProfile.name, avatar_url: finalProfile.avatarUrl, bio: finalProfile.bio })
+      });
+    } catch {}
+
+    onComplete(finalProfile);
   };
 
   return (
