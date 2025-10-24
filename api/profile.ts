@@ -1,5 +1,5 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { extractBearerToken, getClientForToken } from './_supabase';
+import { VercelRequest, VercelResponse } from '@vercel/node';
+const { extractBearerToken, getClientForToken } = require('./_supabase');
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');

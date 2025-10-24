@@ -6,21 +6,23 @@ export function requireEnv(name: string): string {
   return value;
 }
 
-async function supabaseImport() {
-  return await import('@supabase/supabase-js');
+function supabaseRequire() {
+  // Use CommonJS require to avoid ESM issues on Vercel Node runtime
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  return require('@supabase/supabase-js');
 }
 
 export async function getServiceClient(): Promise<SupabaseClient> {
   const url = requireEnv('SUPABASE_URL');
   const key = requireEnv('SUPABASE_SERVICE_ROLE_KEY');
-  const { createClient } = await supabaseImport();
+  const { createClient } = supabaseRequire();
   return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
 }
 
 export async function getClientForToken(accessToken: string): Promise<SupabaseClient> {
   const url = requireEnv('SUPABASE_URL');
   const anon = requireEnv('SUPABASE_ANON_KEY');
-  const { createClient } = await supabaseImport();
+  const { createClient } = supabaseRequire();
   return createClient(url, anon, {
     auth: { persistSession: false, autoRefreshToken: false },
     global: { headers: { Authorization: `Bearer ${accessToken}` } }

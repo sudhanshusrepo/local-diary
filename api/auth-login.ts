@@ -1,5 +1,5 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { requireEnv } from './_supabase';
+import { VercelRequest, VercelResponse } from '@vercel/node';
+const { requireEnv } = require('./_supabase');
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -16,7 +16,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const url = requireEnv('SUPABASE_URL');
     const anon = requireEnv('SUPABASE_ANON_KEY');
-    const { createClient } = await import('@supabase/supabase-js');
+    const { createClient } = require('@supabase/supabase-js');
     const supabase = createClient(url, anon, { auth: { persistSession: false, autoRefreshToken: false } });
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) return res.status(401).json({ error: error.message });
