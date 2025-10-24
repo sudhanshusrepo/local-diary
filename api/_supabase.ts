@@ -1,4 +1,4 @@
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 export function requireEnv(name: string): string {
   const value = process.env[name];
@@ -6,15 +6,21 @@ export function requireEnv(name: string): string {
   return value;
 }
 
-export function getServiceClient(): SupabaseClient {
+async function supabaseImport() {
+  return await import('@supabase/supabase-js');
+}
+
+export async function getServiceClient(): Promise<SupabaseClient> {
   const url = requireEnv('SUPABASE_URL');
   const key = requireEnv('SUPABASE_SERVICE_ROLE_KEY');
+  const { createClient } = await supabaseImport();
   return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
 }
 
-export function getClientForToken(accessToken: string): SupabaseClient {
+export async function getClientForToken(accessToken: string): Promise<SupabaseClient> {
   const url = requireEnv('SUPABASE_URL');
   const anon = requireEnv('SUPABASE_ANON_KEY');
+  const { createClient } = await supabaseImport();
   return createClient(url, anon, {
     auth: { persistSession: false, autoRefreshToken: false },
     global: { headers: { Authorization: `Bearer ${accessToken}` } }

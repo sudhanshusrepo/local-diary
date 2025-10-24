@@ -14,7 +14,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!email || !password) return res.status(400).json({ error: 'email and password required' });
 
   try {
-    const supabase = getServiceClient();
+    const supabase = await getServiceClient();
     const { data, error } = await supabase.auth.admin.createUser({
       email,
       password,

@@ -9,7 +9,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'OPTIONS') return res.status(204).end();
   const token = extractBearerToken(req.headers.authorization);
   if (!token) return res.status(401).json({ error: 'Missing bearer token' });
-  const supabase = getClientForToken(token);
+  const supabase = await getClientForToken(token);
 
   if (req.method === 'POST') {
     const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
