@@ -5,6 +5,10 @@
     { "src": "api/**/*.ts", "use": "@vercel/node" }
   ],
   "routes": [
+    { "src": "/api/auth-login", "methods": ["POST","OPTIONS"], "dest": "/api/auth-login.ts" },
+    { "src": "/api/auth-signup", "methods": ["POST","OPTIONS"], "dest": "/api/auth-signup.ts" },
+    { "src": "/api/profile", "methods": ["GET","PUT","OPTIONS"], "dest": "/api/profile.ts" },
+    { "src": "/api/messages", "methods": ["GET","POST","OPTIONS"], "dest": "/api/messages.ts" },
     { "src": "/api/(.*)", "dest": "/api/$1" },
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/index.html" }
