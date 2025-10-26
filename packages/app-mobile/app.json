@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "Local Diary",
+    "slug": "local-diary-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "backgroundColor": "#0f172a"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.localdairy.mobile"
+    },
+    "android": {
+      "package": "com.localdairy.mobile"
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}

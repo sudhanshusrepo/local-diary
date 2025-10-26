@@ -1,0 +1,7 @@
+{
+  "name": "Local Diary",
+  "description": "A modern work profile app to find and connect with local service professionals near you. Create your profile, set your availability, and start receiving or sending work proposals seamlessly.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
