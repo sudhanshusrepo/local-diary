@@ -31,9 +31,7 @@ const MainApp: React.FC<MainAppProps> = ({ userProfile, onLogout }) => {
 
   return (
     <div className="relative min-h-screen bg-brand-dark pb-20">
-      <div className="container mx-auto max-w-lg">
-        {renderActiveTab()}
-      </div>
+      {renderActiveTab()}
       <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
   );

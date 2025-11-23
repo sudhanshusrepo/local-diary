@@ -1,13 +1,25 @@
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
 import { ServiceProvider } from "../types";
 
-const API_KEY = process.env.API_KEY;
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
 if (!API_KEY) {
   console.warn("API_KEY environment variable not set. AI features will not work.");
 }
 
-const ai = new GoogleGenAI({ apiKey: API_KEY });
+const genAI = new GoogleGenerativeAI(API_KEY);
+
+const model = genAI.getGenerativeModel({
+  model: "gemini-1.5-flash",
+});
+
+const generationConfig = {
+  temperature: 1,
+  topP: 0.95,
+  topK: 64,
+  maxOutputTokens: 8192,
+  responseMimeType: "text/plain",
+};
 
 export async function callGemini(prompt: string): Promise<string> {
   if (!API_KEY) {
@@ -15,12 +27,12 @@ export async function callGemini(prompt: string): Promise<string> {
   }
 
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
+    const chatSession = model.startChat({
+      generationConfig,
+      history: [],
     });
-    
-    return response.text;
+    const result = await chatSession.sendMessage(prompt);
+    return result.response.text();
   } catch (error) {
     console.error("Error calling Gemini API:", error);
     return "Sorry, I encountered an error. Please try again.";
@@ -57,36 +69,16 @@ export async function generateProfileSummary(provider: ServiceProvider): Promise
   `;
 
   try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            summary: {
-              type: Type.STRING,
-              description: "A short, engaging summary of the provider."
-            },
-            highlights: {
-              type: Type.ARRAY,
-              items: { type: Type.STRING },
-              description: "Positive highlights from reviews."
-            },
-            notes: {
-              type: Type.ARRAY,
-              items: { type: Type.STRING },
-              description: "Constructive points or things to note."
-            }
-          },
-          required: ["summary", "highlights", "notes"]
-        }
-      }
-    });
-
-    const jsonText = response.text.trim();
-    return JSON.parse(jsonText);
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+    // Look for the first '{' and the last '}' to extract the JSON object
+    const startIndex = text.indexOf('{');
+    const endIndex = text.lastIndexOf('}');
+    if (startIndex === -1 || endIndex === -1) {
+      throw new Error('Invalid JSON response from AI');
+    }
+    const jsonText = text.substring(startIndex, endIndex + 1);
+    return JSON.parse(jsonText) as ProfileSummary;
   } catch (error) {
     console.error("Error calling Gemini API for profile summary:", error);
     throw new Error("Failed to generate AI summary.");
